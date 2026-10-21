@@ -1,0 +1,150 @@
+SQL Queries
+
+-- Query 1: Loan portfolio summary 
+SELECT COUNT(*)         AS total_loans,
+       SUM(loan_amount) AS total_loan_amount
+FROM Loans;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 2: Loan type analysis
+SELECT loan_type,
+       COUNT(*)         AS loan_count,
+       SUM(loan_amount) AS total_loan_amount
+FROM Loans
+GROUP BY loan_type
+ORDER BY total_loan_amount DESC;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 3: Defaulted loans
+SELECT COUNT(*)         AS defaulted_loans,
+       SUM(loan_amount) AS defaulted_loan_amount
+FROM Loans
+WHERE loan_status = 'Defaulted';
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 4: Customer income analysis
+SELECT income_band,
+       ROUND(AVG(monthly_income), 2) AS avg_monthly_income,
+       MAX(monthly_income)           AS max_monthly_income
+FROM Customers
+GROUP BY income_band;
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 5: Repayment status summary
+SELECT payment_status,
+       COUNT(*)         AS repayment_records,
+       SUM(amount_due)  AS total_amount_due,
+       SUM(amount_paid) AS total_amount_paid
+FROM Repayments
+GROUP BY payment_status;
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 6:  Loan status distribution
+SELECT
+  ROUND(100.0 * SUM(CASE WHEN loan_status='Active'    THEN 1 ELSE 0 END) / COUNT(*), 2) AS active_pct,
+  ROUND(100.0 * SUM(CASE WHEN loan_status='Closed'    THEN 1 ELSE 0 END) / COUNT(*), 2) AS closed_pct,
+  ROUND(100.0 * SUM(CASE WHEN loan_status='Defaulted' THEN 1 ELSE 0 END) / COUNT(*), 2) AS defaulted_pct
+FROM Loans;
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 7:  High-value loans
+SELECT loan_id, customer_id, loan_type, loan_amount
+FROM Loans
+WHERE loan_amount > (SELECT AVG(loan_amount) FROM Loans)
+ORDER BY loan_amount DESC;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 8: Partial payment analysis
+SELECT SUM(amount_due - amount_paid) AS total_unpaid_amount
+FROM Repayments
+WHERE payment_status = 'Partial';
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 9: Overdue analysis
+SELECT dpd_bucket,
+       COUNT(*)                      AS repayment_records,
+       SUM(amount_due - amount_paid) AS total_outstanding
+FROM Repayments
+GROUP BY dpd_bucket
+ORDER BY total_outstanding DESC;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 10: High-risk loan types
+SELECT loan_type,
+       COUNT(*) AS defaulted_loan_count
+FROM Loans
+WHERE loan_status = 'Defaulted'
+GROUP BY loan_type
+HAVING COUNT(*) > 100
+ORDER BY defaulted_loan_count DESC;
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 11:  Customer loan details
+SELECT l.loan_id,
+       l.loan_type,
+       l.loan_amount,
+       l.customer_id,
+       c.city,
+       c.income_band
+FROM Loans l
+JOIN Customers c
+  ON l.customer_id = c.customer_id;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 12: Branch performance
+SELECT b.branch_id,
+       b.branch_name,
+       COUNT(l.loan_id)   AS loan_count,
+       SUM(l.loan_amount) AS total_loan_amount
+FROM Loans l
+JOIN Branches b
+  ON l.branch_id = b.branch_id
+GROUP BY b.branch_id, b.branch_name
+ORDER BY total_loan_amount DESC;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 13: Customers with multiple loans
+SELECT customer_id,
+       COUNT(*) AS loan_count
+FROM Loans
+GROUP BY customer_id
+HAVING COUNT(*) > 3
+ORDER BY loan_count DESC, customer_id;
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 14:  Above-average loan customers
+WITH customer_totals AS (
+    SELECT customer_id,
+           SUM(loan_amount) AS total_borrowing
+    FROM Loans
+    GROUP BY customer_id
+)
+SELECT customer_id,
+       total_borrowing
+FROM customer_totals
+WHERE total_borrowing > (SELECT AVG(total_borrowing)
+                         FROM customer_totals)
+ORDER BY total_borrowing DESC;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 15:  Rank Loan Types
+SELECT loan_type,
+       SUM(loan_amount) AS total_loan_amount,
+       RANK() OVER (ORDER BY SUM(loan_amount) DESC) AS amount_rank
+FROM Loans
+GROUP BY loan_type
+ORDER BY amount_rank;
