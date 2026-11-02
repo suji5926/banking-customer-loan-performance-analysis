@@ -1,3 +1,4 @@
+
 # Banking Customer & Loan Performance Analysis
 
 ## Project Overview
@@ -56,3 +57,17 @@ Data cleaning, Excel PivotTables, SQL querying, aggregation, data validation, ba
 ## Conclusion
 
 This project demonstrates how customer and loan data can be prepared, analyzed and visualized to provide a clearer view of lending activity and loan performance.
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b8b908eb-23f5-49b9-b9ea-4c0caab20ffc" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c17affdb-0c99-4465-83b5-3076d0839227" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/73fa490a-0380-49c5-b13a-81cd64579dca" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b2158b4d-6a48-4e14-81bd-91bf06a54e5f" />
+
+
+
+
+
+
